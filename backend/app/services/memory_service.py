@@ -3,14 +3,23 @@ from app.core.supabase_client import supabase
 
 class MemoryService:
 
-    async def create_session(self):
-        response = (
-            supabase.table("chat_sessions")
-            .insert({})
-            .execute()
-        )
+    async def create_session(
+        self,
+        session_id: str,
+        title: str,
+    ):
+        """
+        Create a new chat session.
+        """
 
-        return response.data[0]["id"]
+        supabase.table("chat_sessions").insert(
+            {
+                "id": session_id,
+                "title": title,
+            }
+        ).execute()
+
+        return session_id
 
     async def save_message(
         self,
@@ -18,6 +27,10 @@ class MemoryService:
         role: str,
         content: str,
     ):
+        """
+        Save a user or assistant message.
+        """
+
         supabase.table("chat_messages").insert(
             {
                 "session_id": session_id,
@@ -26,12 +39,67 @@ class MemoryService:
             }
         ).execute()
 
-    async def get_history(self, session_id: str):
+    async def get_session_messages(
+        self,
+        session_id: str,
+    ):
+        """
+        Get all messages for one chat session.
+        """
+
         response = (
             supabase.table("chat_messages")
             .select("*")
             .eq("session_id", session_id)
             .order("created_at")
+            .execute()
+        )
+
+        return response.data
+
+    async def get_all_sessions(self):
+        """
+        Get all chat sessions.
+        """
+
+        response = (
+            supabase.table("chat_sessions")
+            .select("*")
+            .order("created_at", desc=True)
+            .execute()
+        )
+
+        return response.data
+
+    async def delete_session(
+        self,
+        session_id: str,
+    ):
+        """
+        Delete a session and all its messages.
+        """
+
+        supabase.table("chat_messages") \
+            .delete() \
+            .eq("session_id", session_id) \
+            .execute()
+
+        supabase.table("chat_sessions") \
+            .delete() \
+            .eq("id", session_id) \
+            .execute()
+            
+    async def get_recent_messages(
+        self,
+        session_id: str,
+        limit: int = 20,
+    ):
+        response = (
+            supabase.table("chat_messages")
+            .select("role, content")
+            .eq("session_id", session_id)
+            .order("created_at")
+            .limit(limit)
             .execute()
         )
 
