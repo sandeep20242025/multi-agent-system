@@ -1,0 +1,42 @@
+:root{
+
+/* Primary */
+
+--primary:#3B82F6;
+--primary-light:#60A5FA;
+--primary-dark:#1D4ED8;
+
+/* Accent */
+
+--accent:#00E5FF;
+--accent-purple:#7C3AED;
+
+/* Success */
+
+--success:#22C55E;
+
+/* Warning */
+
+--warning:#FACC15;
+
+/* Danger */
+
+--danger:#EF4444;
+
+/* Background */
+
+--bg-main:#050816;
+--bg-secondary:#0F172A;
+--bg-card:rgba(255,255,255,.06);
+
+/* Text */
+
+--text-primary:#FFFFFF;
+--text-secondary:#94A3B8;
+--text-muted:#64748B;
+
+/* Border */
+
+--border:rgba(255,255,255,.08);
+
+}
