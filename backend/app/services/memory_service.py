@@ -104,6 +104,32 @@ class MemoryService:
         )
 
         return response.data
+    
+    async def update_summary(
+        self,
+        session_id: str,
+        summary: str,
+    ):
+        (
+            supabase.table("chat_sessions")
+            .update({"summary": summary})
+            .eq("id", session_id)
+            .execute()
+        )
+    
+    async def get_summary(
+        self,
+        session_id: str,
+    ):
+        response = (
+            supabase.table("chat_sessions")
+            .select("summary")
+            .eq("id", session_id)
+            .single()
+            .execute()
+        )
+
+        return response.data.get("summary")
 
 
 memory_service = MemoryService()
