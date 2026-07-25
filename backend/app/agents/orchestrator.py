@@ -22,6 +22,7 @@ class Orchestrator:
     async def execute(
         self,
         user_input: str,
+        user_id: str,
         session_id: str | None = None,
     ) -> dict:
         """
@@ -31,6 +32,8 @@ class Orchestrator:
         ----------
         user_input:
             The raw text submitted by the user.
+        user_id:
+            UUID of the authenticated user who owns the session.
         session_id:
             An existing session ID to continue a conversation, or
             ``None`` to start a new session automatically.
@@ -42,5 +45,6 @@ class Orchestrator:
         """
         return await self.workflow.run(
             user_input,
+            user_id,
             session_id,
         )

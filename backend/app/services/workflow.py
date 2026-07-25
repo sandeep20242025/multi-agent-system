@@ -62,6 +62,7 @@ class Workflow:
     async def run(
         self,
         user_input: str,
+        user_id: str,
         session_id: str | None = None,
     ) -> dict:
         """
@@ -71,6 +72,8 @@ class Workflow:
         ----------
         user_input:
             The raw text sent by the user.
+        user_id:
+            UUID of the authenticated user who owns the session.
         session_id:
             An existing session ID to continue a conversation, or
             ``None`` to start a new session.
@@ -82,13 +85,13 @@ class Workflow:
         """
         # 1. Session ---------------------------------------------------------
         if session_id is None:
-            session_id = await self.create_session(user_input)
+            session_id = await self.create_session(user_input, user_id)
 
         # 2. Persist user message --------------------------------------------
         await self.save_user_message(session_id, user_input)
 
         # 3. Build conversation context for agents ---------------------------
-        history, conversation = await self.build_conversation(session_id)
+        history, conversation = await self.build_conversation(session_id, user_id)
 
         # 4. Planner ---------------------------------------------------------
         planner_result = await self.run_planner(
@@ -133,9 +136,10 @@ class Workflow:
         )
 
         # 10. Reload history and conditionally update summary ----------------
-        history, conversation = await self.build_conversation(session_id)
+        history, conversation = await self.build_conversation(session_id, user_id)
         await self.update_summary_if_needed(
             session_id=session_id,
+            user_id=user_id,
             history=history,
             conversation=conversation,
         )
@@ -154,7 +158,7 @@ class Workflow:
     # Session helpers
     # ==================================================================
 
-    async def create_session(self, user_input: str) -> str:
+    async def create_session(self, user_input: str, user_id: str) -> str:
         """
         Generate a new session ID, derive a title from the user's first
         message, and persist the session in the database.
@@ -163,6 +167,8 @@ class Workflow:
         ----------
         user_input:
             Used to generate a short descriptive title.
+        user_id:
+            UUID of the authenticated user who owns the session.
 
         Returns
         -------
@@ -173,6 +179,7 @@ class Workflow:
         title = await title_service.generate_title(user_input)
         await memory_service.create_session(
             session_id=session_id,
+            user_id=user_id,
             title=title,
         )
         return session_id
@@ -208,6 +215,7 @@ class Workflow:
     async def build_conversation(
         self,
         session_id: str,
+        user_id: str,
     ) -> tuple[list, str]:
         """
         Fetch recent messages and return both the raw list and a
@@ -217,13 +225,16 @@ class Workflow:
         ----------
         session_id:
             Target session.
+        user_id:
+            UUID of the authenticated user; passed to ``memory_service`` for
+            ownership verification.
 
         Returns
         -------
         tuple[list, str]
             ``(history_list, formatted_conversation_string)``
         """
-        history: list = await memory_service.get_recent_messages(session_id)
+        history: list = await memory_service.get_recent_messages(session_id, user_id)
         conversation = "".join(
             f"{msg['role'].capitalize()}: {msg['content']}\n"
             for msg in history
@@ -403,6 +414,7 @@ class Workflow:
     async def update_summary_if_needed(
         self,
         session_id: str,
+        user_id: str,
         history: list,
         conversation: str,
     ) -> None:
@@ -414,6 +426,9 @@ class Workflow:
         ----------
         session_id:
             Target session.
+        user_id:
+            UUID of the authenticated user; passed to ``memory_service`` for
+            ownership verification.
         history:
             List of recent message dicts (used for length check).
         conversation:
@@ -425,6 +440,7 @@ class Workflow:
         summary: str = await summary_service.generate_summary(conversation)
         await memory_service.update_summary(
             session_id=session_id,
+            user_id=user_id,
             summary=summary,
         )
 

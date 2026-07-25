@@ -1,33 +1,36 @@
 """
 auth_routes.py
 --------------
-Supabase-backed authentication endpoints.
+Authentication endpoints.  This router is intentionally thin:
 
-All identity operations (sign-up, sign-in, sign-out, current user) are
-delegated entirely to Supabase Auth.  No custom JWT is generated and no
-users table is maintained by this application.
+- Validate the incoming request model.
+- Extract the bearer token where required.
+- Delegate all business logic to ``auth_service``.
+- Return a typed response model.
+
+No Supabase client, no JWT library, and no business logic belong here.
+All auth failures surface as ``AuthenticationException`` from the service
+layer and are handled globally by ``global_exception_handler``.
 
 Endpoints
 ---------
-POST /auth/register  – create a new Supabase Auth user
+POST /auth/register  – create a new account
 POST /auth/login     – sign in with email + password
-POST /auth/logout    – invalidate the current session token
+POST /auth/logout    – invalidate the current session
+POST /auth/refresh   – exchange a refresh token for a new token pair
 GET  /auth/me        – return the authenticated user's profile
 """
 
-from fastapi import APIRouter, HTTPException, Header, status
+from fastapi import APIRouter, Header, Body, status
 
-from gotrue.errors import AuthApiError
-
-from app.core.supabase_auth_client import supabase_auth
-from app.api.schemas.auth_schemas import (
+from app.models.auth_models import (
     RegisterRequest,
     LoginRequest,
-    LogoutRequest,
     AuthResponse,
-    UserResponse,
-    MessageResponse,
+    CurrentUserResponse,
 )
+from app.services.auth_service import auth_service
+from app.core.exceptions import AuthenticationException
 
 router = APIRouter(
     prefix="/auth",
@@ -36,60 +39,24 @@ router = APIRouter(
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Helper
 # ---------------------------------------------------------------------------
 
 
-def _build_auth_response(session) -> AuthResponse:
+def _extract_bearer(authorization: str | None) -> str:
     """
-    Map a Supabase ``Session`` + ``User`` pair to ``AuthResponse``.
+    Pull the raw token from an ``Authorization: Bearer <token>`` header.
 
-    Parameters
-    ----------
-    session:
-        The ``Session`` object returned by Supabase after sign-up or sign-in.
-
-    Returns
-    -------
-    AuthResponse
+    Raises ``AuthenticationException`` (→ HTTP 401 via the global handler)
+    instead of ``HTTPException`` so the error shape stays consistent with
+    every other auth failure in this application.
     """
-    return AuthResponse(
-        access_token=session.access_token,
-        user=UserResponse(
-            id=str(session.user.id),
-            email=session.user.email,
-        ),
-    )
-
-
-def _require_bearer(authorization: str | None) -> str:
-    """
-    Extract and return the raw token from an ``Authorization: Bearer …``
-    header, or raise **401** if the header is absent or malformed.
-
-    Parameters
-    ----------
-    authorization:
-        Raw value of the ``Authorization`` header.
-
-    Returns
-    -------
-    str
-        The token portion (everything after ``"Bearer "``).
-
-    Raises
-    ------
-    HTTPException
-        **401** when the header is missing or does not start with
-        ``"Bearer "``.
-    """
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing or invalid Authorization header. "
-                   "Expected: 'Bearer <token>'",
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise AuthenticationException(
+            "Missing or invalid Authorization header. "
+            "Expected format: 'Bearer <token>'"
         )
-    return authorization.removeprefix("Bearer ").strip()
+    return authorization.split(" ", 1)[1].strip()
 
 
 # ---------------------------------------------------------------------------
@@ -102,43 +69,24 @@ def _require_bearer(authorization: str | None) -> str:
     response_model=AuthResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user",
+    description=(
+        "Create a new account using email and password. "
+        "An optional full name is stored in the user profile. "
+        "Returns an access token immediately when email confirmation is disabled."
+    ),
 )
 async def register(body: RegisterRequest) -> AuthResponse:
-    """
-    Create a new Supabase Auth user and return an access token.
-
-    Supabase will send a confirmation e-mail if the project has e-mail
-    confirmation enabled; the returned session token is valid immediately
-    if confirmation is disabled.
-
-    Raises
-    ------
-    HTTPException
-        **400** when Supabase rejects the request (e.g. duplicate e-mail,
-        weak password).
-    """
-    try:
-        result = supabase_auth.auth.sign_up(
-            {
-                "email": body.email,
-                "password": body.password,
-            }
-        )
-    except AuthApiError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=exc.message,
-        ) from exc
-
-    if result.session is None:
-        # Supabase returns session=None when e-mail confirmation is required.
-        raise HTTPException(
-            status_code=status.HTTP_201_CREATED,
-            detail="Registration successful. "
-                   "Please confirm your e-mail address before signing in.",
-        )
-
-    return _build_auth_response(result.session)
+    result = await auth_service.register(
+        email=body.email,
+        password=body.password,
+        full_name=body.full_name,
+    )
+    return AuthResponse(
+        success=True,
+        message=result["message"],
+        user_id=result["user_id"],
+        email=result["email"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -151,38 +99,24 @@ async def register(body: RegisterRequest) -> AuthResponse:
     response_model=AuthResponse,
     status_code=status.HTTP_200_OK,
     summary="Sign in with email and password",
+    description=(
+        "Authenticate with a registered email and password. "
+        "Returns a Supabase access token and refresh token on success."
+    ),
 )
 async def login(body: LoginRequest) -> AuthResponse:
-    """
-    Authenticate with email + password and return a Supabase access token.
-
-    Raises
-    ------
-    HTTPException
-        **401** for invalid credentials; **400** for all other Supabase
-        Auth errors.
-    """
-    try:
-        result = supabase_auth.auth.sign_in_with_password(
-            {
-                "email": body.email,
-                "password": body.password,
-            }
-        )
-    except AuthApiError as exc:
-        # Supabase returns "Invalid login credentials" for wrong password /
-        # unknown e-mail; surface that as 401.
-        status_code = (
-            status.HTTP_401_UNAUTHORIZED
-            if "invalid" in exc.message.lower() or "credentials" in exc.message.lower()
-            else status.HTTP_400_BAD_REQUEST
-        )
-        raise HTTPException(
-            status_code=status_code,
-            detail=exc.message,
-        ) from exc
-
-    return _build_auth_response(result.session)
+    result = await auth_service.login(
+        email=body.email,
+        password=body.password,
+    )
+    return AuthResponse(
+        success=True,
+        message="Login successful.",
+        access_token=result["access_token"],
+        refresh_token=result["refresh_token"],
+        user_id=result["user_id"],
+        email=result["email"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -192,34 +126,51 @@ async def login(body: LoginRequest) -> AuthResponse:
 
 @router.post(
     "/logout",
-    response_model=MessageResponse,
+    response_model=AuthResponse,
     status_code=status.HTTP_200_OK,
     summary="Sign out and invalidate the current session",
+    description=(
+        "Invalidate the Supabase session tied to the supplied bearer token. "
+        "Pass the access token in the Authorization header as 'Bearer <token>'. "
+        "The client should discard both tokens after a successful response."
+    ),
 )
-async def logout(body: LogoutRequest) -> MessageResponse:
-    """
-    Invalidate the Supabase session associated with the given access token.
+async def logout(
+    authorization: str | None = Header(default=None),
+) -> AuthResponse:
+    access_token = _extract_bearer(authorization)
+    result = await auth_service.logout(access_token)
+    return AuthResponse(
+        success=True,
+        message=result["message"],
+    )
 
-    The client should discard the token after a successful response
-    regardless of outcome.
 
-    Raises
-    ------
-    HTTPException
-        **400** if Supabase rejects the sign-out request.
-    """
-    try:
-        # Inject the user's token so Supabase invalidates *their* session,
-        # not the service-role session.
-        supabase_auth.auth.set_session(body.access_token, "")
-        supabase_auth.auth.sign_out()
-    except AuthApiError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=exc.message,
-        ) from exc
+# ---------------------------------------------------------------------------
+# POST /auth/refresh
+# ---------------------------------------------------------------------------
 
-    return MessageResponse(message="Logged out successfully.")
+
+@router.post(
+    "/refresh",
+    response_model=AuthResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Refresh the session token",
+    description=(
+        "Exchange a valid refresh token for a new access/refresh token pair. "
+        "Send the refresh token in the JSON body under the key ``refresh_token``."
+    ),
+)
+async def refresh(
+    refresh_token: str = Body(..., embed=True),
+) -> AuthResponse:
+    result = await auth_service.refresh_session(refresh_token)
+    return AuthResponse(
+        success=True,
+        message="Session refreshed successfully.",
+        access_token=result["access_token"],
+        refresh_token=result["refresh_token"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -229,42 +180,22 @@ async def logout(body: LogoutRequest) -> MessageResponse:
 
 @router.get(
     "/me",
-    response_model=UserResponse,
+    response_model=CurrentUserResponse,
     status_code=status.HTTP_200_OK,
-    summary="Return the currently authenticated user",
+    summary="Get the authenticated user",
+    description=(
+        "Validate the bearer token and return the associated user profile. "
+        "Pass the access token in the Authorization header as 'Bearer <token>'."
+    ),
 )
 async def me(
     authorization: str | None = Header(default=None),
-) -> UserResponse:
-    """
-    Validate the bearer token and return the associated user profile.
-
-    The ``Authorization`` header must be present and follow the
-    ``Bearer <token>`` scheme.
-
-    Raises
-    ------
-    HTTPException
-        **401** if the header is absent, malformed, or the token is
-        expired / invalid.
-    """
-    token = _require_bearer(authorization)
-
-    try:
-        result = supabase_auth.auth.get_user(token)
-    except AuthApiError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=exc.message,
-        ) from exc
-
-    if result.user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token.",
-        )
-
-    return UserResponse(
-        id=str(result.user.id),
-        email=result.user.email,
+) -> CurrentUserResponse:
+    access_token = _extract_bearer(authorization)
+    result = await auth_service.get_current_user(access_token)
+    return CurrentUserResponse(
+        success=True,
+        user_id=result["user_id"],
+        email=result["email"],
+        full_name=result["full_name"],
     )

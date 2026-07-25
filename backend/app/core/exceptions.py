@@ -58,9 +58,9 @@ class SessionNotFoundException(AgentException):
 # =====================================================
 
 class AuthenticationException(AgentException):
-    def __init__(self):
+    def __init__(self, message: str = "Authentication failed."):
         super().__init__(
-            message="Authentication failed.",
+            message=message,
             status_code=401,
         )
 
