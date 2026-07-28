@@ -1,0 +1,423 @@
+/* ══════════════════════════════════════════════════════════
+   Navbar — Organism
+   Glassmorphism sticky navigation bar.
+   All values reference design tokens from variables.css.
+══════════════════════════════════════════════════════════ */
+
+/* ── Bar ──────────────────────────────────────────────── */
+.navbar {
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 0 32px;
+    height: 64px;
+
+    background: rgba(5, 8, 22, 0.55);
+    border-bottom: 1px solid var(--border);
+
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+
+    transition:
+        height         var(--transition),
+        padding        var(--transition),
+        background     var(--transition),
+        border-color   var(--transition),
+        box-shadow     var(--transition);
+}
+
+/* position: fixed only when sticky prop is true */
+.sticky {
+    position: fixed;
+}
+
+/* Scroll > 10px → solid glass */
+.scrolled {
+    background: rgba(5, 8, 22, 0.92);
+    border-color: var(--border-hover);
+    box-shadow: 0 1px 40px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(0, 229, 255, 0.04);
+}
+
+/* Scroll > 60px → shrink */
+.shrunk {
+    height: 52px;
+    padding: 0 28px;
+}
+
+/* ── Brand ────────────────────────────────────────────── */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    outline-offset: 4px;
+    transition: opacity var(--transition);
+}
+
+.brand:hover   { opacity: 0.85; }
+.brand:focus-visible {
+    outline: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+}
+
+/* Logo mark box */
+.logoMark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1.5px solid var(--accent);
+    background: var(--bg-glass);
+    box-shadow: 0 0 14px var(--accent-glow);
+
+    transition:
+        width       var(--transition),
+        height      var(--transition),
+        box-shadow  var(--transition);
+}
+
+.shrunk .logoMark {
+    width:  28px;
+    height: 28px;
+    border-radius: 7px;
+}
+
+.brand:hover .logoMark {
+    box-shadow: 0 0 22px var(--accent-glow);
+}
+
+.logoSymbol {
+    font-family: "Orbitron", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    transition: font-size var(--transition);
+}
+
+.shrunk .logoSymbol { font-size: 13px; }
+
+/* Text stack */
+.brandText {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.brandName {
+    font-family: "Orbitron", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition: font-size var(--transition);
+}
+
+.shrunk .brandName { font-size: 12px; }
+
+.brandSub {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    line-height: 1.4;
+    /* hidden by JS when shrunk — no CSS needed */
+}
+
+/* ── Centre: Desktop navigation ──────────────────────── */
+.desktopNav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    justify-content: center;
+}
+
+/* Individual nav link */
+.navLink {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 15px;
+    border-radius: var(--radius-sm);
+
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        color       var(--transition),
+        background  var(--transition);
+}
+
+.navLink:hover {
+    color: var(--text-primary);
+    background: var(--bg-glass);
+}
+
+.navLink:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.navLinkActive {
+    color: var(--accent);
+}
+
+/* Active underline indicator — CSS-drawn inside the <a> */
+.activeBar {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    translate: -50% 0;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ── Right: Controls ──────────────────────────────────── */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Constrain SearchBar width so it doesn't overflow */
+.searchBar {
+    width: 200px;
+    transition: width var(--transition-slow);
+}
+
+.searchBar:focus-within {
+    width: 260px;
+}
+
+/* Avatar ring on hover */
+.avatar {
+    cursor: pointer;
+    transition: box-shadow var(--transition);
+}
+
+.avatar:hover {
+    box-shadow: 0 0 0 2px var(--accent-glow);
+    border-radius: var(--radius-full);
+}
+
+/* ── Hamburger button (mobile only) ──────────────────── */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    padding: 7px;
+    flex-shrink: 0;
+
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+
+    transition:
+        border-color    var(--transition),
+        background      var(--transition);
+}
+
+.hamburger:hover {
+    border-color: var(--border-hover);
+    background: rgba(0, 229, 255, 0.08);
+}
+
+.hamburger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Three bars */
+.bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--text-secondary);
+    border-radius: 2px;
+    transform-origin: center;
+    transition:
+        transform   var(--transition),
+        opacity     var(--transition),
+        background  var(--transition);
+}
+
+.hamburger:hover .bar { background: var(--accent); }
+
+/* Morph bars → × when open */
+.hamburgerOpen .bar:nth-child(1) { transform: translateY(7px) rotate(45deg);  }
+.hamburgerOpen .bar:nth-child(2) { opacity: 0; transform: scaleX(0);          }
+.hamburgerOpen .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hamburgerOpen .bar              { background: var(--accent); }
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE DRAWER
+══════════════════════════════════════════════════════════ */
+
+.drawer {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+
+    background: rgba(5, 8, 22, 0.97);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    overflow: hidden;
+
+    /* Collapsed state */
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        max-height  0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity     0.2s ease;
+}
+
+/* Accounts for shrunk bar */
+.shrunk ~ .drawer { top: 52px; }
+
+.drawerOpen {
+    max-height: 560px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Nav links inside drawer */
+.drawerLinks {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 16px 8px;
+    gap: 2px;
+}
+
+.mobileNavLink {
+    display: flex;
+    align-items: center;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition), background var(--transition);
+}
+
+.mobileNavLink:hover,
+.mobileNavLink:focus-visible {
+    color: var(--text-primary);
+    background: var(--bg-glass);
+}
+
+.mobileNavLink.navLinkActive {
+    color: var(--accent);
+    background: rgba(0, 229, 255, 0.06);
+}
+
+/* Controls row inside drawer (search + molecules + avatar) */
+.drawerControls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.drawerSearch {
+    width: 100%;
+}
+
+/* ── Backdrop ─────────────────────────────────────────── */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    top: 64px;
+    z-index: 98;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: backdropIn 0.2s ease forwards;
+}
+
+@keyframes backdropIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+
+/* Tablet — hide search text expansion */
+@media (max-width: 1024px) {
+    .searchBar         { width: 160px; }
+    .searchBar:focus-within { width: 200px; }
+}
+
+/* Mobile — collapse desktop nav, show hamburger */
+@media (max-width: 768px) {
+    .navbar      { padding: 0 16px; gap: 8px; }
+    .desktopNav  { display: none; }
+    .hamburger   { display: flex; }
+
+    /* Hide desktop controls; they live inside the drawer on mobile */
+    .controls > *:not(.hamburger) { display: none; }
+
+    /* But always show hamburger */
+    .controls > .hamburger { display: flex; }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .brandSub  { display: none; }
+    .brandName { font-size: 12px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .navbar,
+    .drawer,
+    .bar,
+    .logoMark,
+    .brandName,
+    .logoSymbol,
+    .searchBar,
+    .backdrop { transition: none !important; animation: none !important; }
+}

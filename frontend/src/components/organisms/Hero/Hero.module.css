@@ -1,0 +1,489 @@
+/* ─────────────────────────────────────────────────────────
+   Hero — Organism
+   Two-column layout: left copy + CTA, right agent network.
+   Transparent background — sits over AnimatedBackground.
+───────────────────────────────────────────────────────── */
+
+/* ── Local keyframes ──────────────────────────────────── */
+
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes heroFadeRight {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes heroFadeLeft {
+    from { opacity: 0; transform: translateX(16px); }
+    to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes networkFloat {
+    0%, 100% { transform: translateY(0px);   }
+    50%       { transform: translateY(-10px); }
+}
+
+@keyframes connectorPulse {
+    0%   { left: 0%;   opacity: 0;   }
+    20%  { opacity: 1;               }
+    80%  { opacity: 1;               }
+    100% { left: 100%; opacity: 0;   }
+}
+
+@keyframes nodeGlow {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+    50%       { box-shadow: 0 0 0 6px transparent;      }
+}
+
+@keyframes gradientShift {
+    0%   { background-position: 0% 50%;   }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%;   }
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: rotate(45deg) translateY(0);    }
+    50%       { transform: rotate(45deg) translateY(5px); }
+}
+
+/* ── Section shell ────────────────────────────────────── */
+
+.section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 32px 80px; /* top clears the fixed 64px navbar */
+    overflow: hidden;
+}
+
+/* ── Two-column grid ──────────────────────────────────── */
+
+.grid {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 64px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEFT COLUMN — Copy & CTAs
+───────────────────────────────────────────────────────── */
+
+.left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    animation: heroFadeRight 0.7s ease 0.1s both;
+}
+
+/* Eyebrow badge */
+.badge {
+    font-family: "Orbitron", sans-serif;
+    font-size: 10px !important;
+    letter-spacing: 0.14em !important;
+}
+
+/* Heading */
+.title {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(2rem, 4.5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+}
+
+.titleLine {
+    display: block;
+}
+
+/* Second title line — animated gradient accent */
+.titleLineAccent {
+    background: var(--gradient-primary);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--accent); /* fallback */
+    animation: gradientShift 4s ease infinite;
+}
+
+/* Body copy */
+.description {
+    margin: 0;
+    font-size: clamp(0.95rem, 1.8vw, 1.08rem);
+    color: var(--text-secondary);
+    line-height: 1.75;
+    max-width: 480px;
+}
+
+/* CTA button row */
+.cta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.ctaPrimary {
+    /* slight glow behind the primary button */
+    box-shadow: 0 0 24px var(--accent-glow);
+}
+
+/* Stat strip */
+.stats {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    width: 100%;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    padding: 0 20px 0 0;
+}
+
+.stat:first-child { padding-left: 0; }
+
+.statValue {
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.statLabel {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.statDivider {
+    width: 1px;
+    background: var(--border);
+    margin: 0 20px;
+    align-self: stretch;
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RIGHT COLUMN — Agent Network Card
+───────────────────────────────────────────────────────── */
+
+.right {
+    display: flex;
+    justify-content: center;
+    animation: heroFadeLeft 0.7s ease 0.25s both;
+}
+
+/* Floating card */
+.networkCard {
+    width: 100%;
+    max-width: 420px;
+    animation: networkFloat 6s ease-in-out infinite;
+    animation-delay: 0.5s;
+}
+
+/* Card header row */
+.networkHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.networkTitle {
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+/* Agent ordered list */
+.agentList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.agentItem {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Connector between nodes */
+.connector {
+    position: relative;
+    height: 16px;
+    margin: 0 20px;       /* indent to align with node icon centre */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.connectorLine {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    transform: translateY(-50%);
+}
+
+/* Animated pulse dot that travels along the connector */
+.connectorPulse {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 8px var(--accent-glow);
+    animation: connectorPulse 2.4s linear infinite;
+}
+
+/* ── Agent node ─────────────────────────────────────────── */
+
+.agentNode {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: background var(--transition), border-color var(--transition);
+    animation: heroFadeUp 0.5s ease both;
+}
+
+/* Status colour variants */
+.node_active {
+    border-color: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.04);
+    animation: nodeGlow 2.5s ease-in-out infinite;
+}
+
+.node_processing {
+    border-color: rgba(var(--accent-rgb, 0, 229, 255), 0.2);
+    border-color: var(--border);
+    background: var(--bg-glass);
+}
+
+.node_idle {
+    background: transparent;
+    border-color: transparent;
+}
+
+/* Icon box */
+.agentIcon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    font-size: 16px;
+    color: var(--accent);
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.node_active .agentIcon {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: var(--success);
+}
+
+/* Text stack */
+.agentInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.agentLabel {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.agentRole {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status badge (right-aligned) */
+.agentStatus {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+/* Card footer */
+.networkFooter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.footerText {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: "Orbitron", sans-serif;
+}
+
+.footerDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SCROLL HINT
+───────────────────────────────────────────────────────── */
+
+.scrollHint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    pointer-events: none;
+    animation: heroFadeUp 0.8s ease 1.4s both;
+}
+
+.scrollLabel {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.scrollArrow {
+    width: 16px;
+    height: 16px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    animation: scrollBounce 1.8s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────── */
+
+/* Tablet: reduce gap */
+@media (max-width: 1024px) {
+    .grid { gap: 40px; }
+    .networkCard { max-width: 360px; }
+}
+
+/* Mobile: single column, left-aligned → centred */
+@media (max-width: 768px) {
+    .section { padding: 88px 20px 72px; }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .left {
+        align-items: center;
+    }
+
+    .description { max-width: 100%; }
+
+    .cta { justify-content: center; }
+
+    .stats { justify-content: center; }
+
+    .stat { align-items: center; padding: 0 16px; }
+    .stat:first-child { padding-left: 16px; }
+
+    .right {
+        order: -1;          /* show network card above copy on mobile */
+    }
+
+    .networkCard {
+        max-width: 400px;
+        animation: none;    /* stop float on small screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .title { font-size: clamp(1.75rem, 7vw, 2.5rem); }
+    .cta { flex-direction: column; align-items: stretch; }
+    .stats { flex-wrap: wrap; gap: 16px; }
+    .statDivider { display: none; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .left,
+    .right,
+    .scrollHint       { animation: none; opacity: 1; }
+
+    .titleLineAccent  { animation: none; }
+    .connectorPulse   { animation: none; opacity: 0.5; left: 50%; }
+    .networkCard      { animation: none; }
+    .node_active      { animation: none; }
+    .scrollArrow      { animation: none; }
+    .agentNode        { animation: none; opacity: 1; }
+}

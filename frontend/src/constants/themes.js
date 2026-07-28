@@ -4,7 +4,7 @@ const THEMES = {
     JARVIS: "jarvis",
     CYBER: "cyber",
     MATRIX: "matrix",
-    SYSTEM: "system",
 };
 
 export default THEMES;
+export { THEMES };

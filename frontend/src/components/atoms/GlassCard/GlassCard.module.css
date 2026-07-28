@@ -1,78 +1,51 @@
+/* ── GlassCard — Atom ──────────────────────────────────── */
+/* blur prop: sm | md | lg  →  styles.blurSm/blurMd/blurLg  */
+/* padding prop: sm | md | lg → styles.sm/md/lg              */
+
 .card {
     position: relative;
     overflow: hidden;
 
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-glass);
+    border-radius: var(--radius-lg);
 
-    border-radius: 24px;
+    transition: transform var(--transition-slow), box-shadow var(--transition-slow);
 
-    transition: all .35s ease;
-
-    backdrop-filter: blur(24px);
-
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
 }
 
+/* inner shimmer overlay */
 .card::before {
     content: "";
-
     position: absolute;
-
     inset: 0;
-
-    background: linear-gradient(135deg,
-            rgba(255, 255, 255, .10),
-            rgba(255, 255, 255, .02));
-
+    background: var(--gradient-card);
     pointer-events: none;
+    border-radius: inherit;
 }
 
+/* ── Hover ──────────────────────────────────────────────── */
 .hover:hover {
-
-    transform: translateY(-8px);
-
-    box-shadow:
-        0 20px 60px rgba(0, 229, 255, .15);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
 }
 
+/* ── Border ─────────────────────────────────────────────── */
 .bordered {
-
-    border: 1px solid rgba(255, 255, 255, .08);
-
+    border: 1px solid var(--border);
+}
+.bordered:hover {
+    border-color: var(--border-hover);
 }
 
-.sm {
+/* ── Padding variants ───────────────────────────────────── */
+.sm  { padding: 16px; }
+.md  { padding: 24px; }
+.lg  { padding: 36px; }
 
-    padding: 16px;
-
-}
-
-.md {
-
-    padding: 24px;
-
-}
-
-.lg {
-
-    padding: 36px;
-
-}
-
-.blurSm {
-
-    backdrop-filter: blur(12px);
-
-}
-
-.blurMd {
-
-    backdrop-filter: blur(24px);
-
-}
-
-.blurLg {
-
-    backdrop-filter: blur(40px);
-
-}
+/* ── Blur variants ──────────────────────────────────────── */
+/* Note: blur prop values are "sm"|"md"|"lg" but CSS classes are blurSm etc. */
+.blurSm { backdrop-filter: var(--blur-sm); -webkit-backdrop-filter: var(--blur-sm); }
+.blurMd { backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md); }
+.blurLg { backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg); }

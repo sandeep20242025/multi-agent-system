@@ -1,0 +1,301 @@
+/* ── AnimatedBackground — System/Background ───────────── */
+
+/*
+ * This is the SYSTEM-LAYER background engine.
+ * It renders a fixed canvas only — no children / content wrapper.
+ *
+ * For page-level wrapping (canvas + children) use:
+ *   @/components/organisms/AnimatedBackground
+ */
+
+/* ── Canvas base ──────────────────────────────────────── */
+.canvas {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--bg-main);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT: gradient
+   Pure static radial gradient, no animation.
+══════════════════════════════════════════════════════ */
+.gradient {
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 30%,  var(--accent-glow)          0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 70%,  rgba(124, 58, 237, 0.15)   0%, transparent 60%),
+        var(--bg-main);
+}
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT: aurora
+   Floating blurred blobs — the classic Jarvis look.
+══════════════════════════════════════════════════════ */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    will-change: transform;
+}
+
+/* blob1 — accent (cyan) — top-left */
+.blob1 {
+    width: 700px;
+    height: 700px;
+    background: var(--accent);
+    opacity: 0.22;
+    top: -250px;
+    left: -180px;
+    animation: aurora-blob1 22s ease-in-out infinite;
+}
+
+/* blob2 — purple — bottom-right */
+.blob2 {
+    width: 640px;
+    height: 640px;
+    background: var(--accent-purple);
+    opacity: 0.2;
+    bottom: -230px;
+    right: -150px;
+    animation: aurora-blob2 28s ease-in-out infinite;
+}
+
+/* blob3 — secondary blue — centre */
+.blob3 {
+    width: 520px;
+    height: 520px;
+    background: var(--accent-secondary);
+    opacity: 0.15;
+    top: 25%;
+    left: 38%;
+    animation: aurora-blob3 18s ease-in-out infinite;
+}
+
+@keyframes aurora-blob1 {
+    0%   { transform: translate(0px, 0px)   scale(1);   }
+    33%  { transform: translate(60px, 40px) scale(1.08); }
+    66%  { transform: translate(-40px, 80px) scale(0.95); }
+    100% { transform: translate(0px, 0px)   scale(1);   }
+}
+
+@keyframes aurora-blob2 {
+    0%   { transform: translate(0px, 0px)    scale(1);   }
+    33%  { transform: translate(-80px, -40px) scale(1.1); }
+    66%  { transform: translate(50px, -60px) scale(0.9);  }
+    100% { transform: translate(0px, 0px)    scale(1);   }
+}
+
+@keyframes aurora-blob3 {
+    0%   { transform: translate(0px, 0px)   scale(1);    }
+    50%  { transform: translate(80px, -60px) scale(1.15); }
+    100% { transform: translate(0px, 0px)   scale(1);    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT: mesh-gradient
+   5 orbs placed at deliberate viewport positions.
+   Subtle movement, no blur — mesh feel.
+══════════════════════════════════════════════════════ */
+.mesh_gradient {
+    background: var(--bg-main);
+}
+
+.meshOrb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    will-change: transform;
+}
+
+.meshOrb1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.15;
+    top: -10%;  left: -5%;
+    animation: mesh-drift1 20s ease-in-out infinite;
+}
+.meshOrb2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+    opacity: 0.18;
+    top: 40%;  left: 55%;
+    animation: mesh-drift2 25s ease-in-out infinite;
+}
+.meshOrb3 {
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+    opacity: 0.14;
+    bottom: -5%;  right: -5%;
+    animation: mesh-drift3 18s ease-in-out infinite;
+}
+.meshOrb4 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.1;
+    top: 60%;  left: 15%;
+    animation: mesh-drift1 30s ease-in-out infinite reverse;
+}
+.meshOrb5 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+    opacity: 0.12;
+    top: 15%;  right: 10%;
+    animation: mesh-drift2 22s ease-in-out infinite reverse;
+}
+
+@keyframes mesh-drift1 {
+    0%, 100% { transform: translate(0, 0);    }
+    50%       { transform: translate(40px, 30px); }
+}
+@keyframes mesh-drift2 {
+    0%, 100% { transform: translate(0, 0);      }
+    50%       { transform: translate(-50px, 20px); }
+}
+@keyframes mesh-drift3 {
+    0%, 100% { transform: translate(0, 0);       }
+    50%       { transform: translate(30px, -40px); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT: particles-placeholder
+   Deterministic floating dots — pure CSS, no JS lib.
+══════════════════════════════════════════════════════ */
+.particles_placeholder {
+    background: var(--bg-main);
+}
+
+.particleField {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    animation: particle-rise linear infinite;
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+@keyframes particle-rise {
+    0%   { opacity: 0;   transform: translateY(0)      scale(0.4); }
+    8%   { opacity: 0.7; }
+    92%  { opacity: 0.3; }
+    100% { opacity: 0;   transform: translateY(-160px) scale(1.3); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   VARIANT: video-placeholder
+   Dark base + striped pattern to hint at video content.
+══════════════════════════════════════════════════════ */
+.video_placeholder {
+    background: #000;
+}
+
+.videoPlaceholder {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.01) 0px,
+        rgba(255, 255, 255, 0.01) 1px,
+        transparent 1px,
+        transparent 12px
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.videoLabel {
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: rgba(255, 255, 255, 0.12);
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px 20px;
+    border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHARED LAYERS
+══════════════════════════════════════════════════════ */
+
+/* ── Grid ─────────────────────────────────────────────── */
+.grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.5;
+}
+
+/* ── Scan line ────────────────────────────────────────── */
+.scanLine {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent     0%,
+        var(--accent)  25%,
+        var(--accent)  75%,
+        transparent   100%
+    );
+    opacity: 0.07;
+    animation: scan-line 12s linear infinite;
+    pointer-events: none;
+}
+
+/* ── Vignette ─────────────────────────────────────────── */
+.vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at center,
+        transparent  35%,
+        rgba(0, 0, 0, 0.6) 100%
+    );
+}
+
+/* ═══════════════════════════════════════════════════════
+   INTENSITY modifiers
+   Applied as a second class to scale visual weight.
+══════════════════════════════════════════════════════ */
+.intensity_low .blob,
+.intensity_low .meshOrb   { opacity: 0.08 !important; }
+.intensity_low .grid       { opacity: 0.25 !important; }
+.intensity_low .scanLine   { opacity: 0.04 !important; }
+
+.intensity_high .blob,
+.intensity_high .meshOrb  { opacity: 0.38 !important; }
+.intensity_high .grid      { opacity: 0.7  !important; }
+.intensity_high .scanLine  { opacity: 0.12 !important; }
+
+/* ═══════════════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .blob,
+    .meshOrb {
+        animation: none !important;
+    }
+
+    .scanLine {
+        animation: none !important;
+        opacity: 0 !important;
+    }
+
+    .particle {
+        animation: none !important;
+        opacity: 0 !important;
+    }
+}

@@ -1,0 +1,240 @@
+/* ── BootScreen — System/Boot ─────────────────────────── */
+
+/* ── Overlay ──────────────────────────────────────────── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 0;               /* gaps handled by slot margins */
+    overflow: hidden;
+}
+
+/* ── Scan line ────────────────────────────────────────── */
+.scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.12;
+    animation: scan-line 4s linear infinite;
+    pointer-events: none;
+}
+
+/* ── Corner decorations ───────────────────────────────── */
+.corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    opacity: 0.25;
+}
+.corner::before,
+.corner::after {
+    content: "";
+    position: absolute;
+    background: var(--accent);
+}
+.corner::before { width: 100%; height: 1.5px; top: 0; left: 0; }
+.corner::after  { width: 1.5px; height: 100%; top: 0; left: 0; }
+
+.cornerTL { top: 24px;    left: 24px;  }
+.cornerTR { top: 24px;    right: 24px; transform: scaleX(-1); }
+.cornerBL { bottom: 24px; left: 24px;  transform: scaleY(-1); }
+.cornerBR { bottom: 24px; right: 24px; transform: scale(-1);  }
+
+/* ── Default logo block ───────────────────────────────── */
+.logoSlot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+    animation: fade-in 0.6s ease both;
+}
+
+.ringWrap {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ringOuter {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--accent);
+    border-right-color: rgba(0, 229, 255, 0.25);
+    animation: spin 1.8s linear infinite;
+}
+
+.ringInner {
+    position: absolute;
+    inset: 11px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-bottom-color: var(--accent-secondary);
+    animation: spin 2.6s linear infinite reverse;
+    opacity: 0.55;
+}
+
+.ringGlow {
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border-hover);
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+}
+
+.logoSymbol {
+    position: relative;
+    z-index: 1;
+    font-family: "Orbitron", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 24px var(--accent), 0 0 48px var(--accent-glow);
+}
+
+.logoName {
+    font-family: "Orbitron", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.logoSub {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* ── Loading slot (wraps whatever is passed) ──────────── */
+.loadingSlot {
+    margin-bottom: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Default log messages ─────────────────────────────── */
+.logSlot {
+    width: min(360px, 90vw);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 28px;
+}
+
+.logLine {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 2px 0;
+    font-size: 12px;
+    font-family: "Courier New", "Lucida Console", monospace;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    opacity: 0;
+    animation: slide-in-left 0.22s ease forwards;
+}
+
+.logLineDone  { opacity: 0.5; }
+.logLineLast  { color: var(--text-primary); opacity: 1; }
+
+.logPrefix {
+    color: var(--accent);
+    flex-shrink: 0;
+    font-size: 10px;
+    user-select: none;
+}
+
+.logText { flex: 1; min-width: 0; }
+
+.logOk {
+    color: var(--success);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.logCursor {
+    display: inline-block;
+    width: 8px;
+    height: 13px;
+    background: var(--accent);
+    margin-left: 2px;
+    animation: blink 0.9s step-end infinite;
+    flex-shrink: 0;
+}
+
+/* ── Progress slot ────────────────────────────────────── */
+.progressSlot {
+    width: min(360px, 90vw);
+    animation: fade-in 0.5s ease 0.4s both;
+}
+
+.progressTrack {
+    position: relative;
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: visible;
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 3px;
+    box-shadow: 0 0 10px var(--accent-glow);
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressHead {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent), 0 0 22px var(--accent-glow);
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressLabel {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 10px;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ── Reduced motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .scan,
+    .ringOuter,
+    .ringInner,
+    .logCursor         { animation: none !important; opacity: 1; }
+
+    .progressFill,
+    .progressHead      { transition: none !important; }
+
+    .logoSlot,
+    .logLine           { animation: none !important; opacity: 1; }
+}

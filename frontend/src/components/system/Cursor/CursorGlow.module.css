@@ -1,0 +1,39 @@
+/* ── CursorGlow — System/Cursor ───────────────────────── */
+
+/*
+ * The element is positioned at top:0 / left:0 at all times.
+ * Translation to follow the cursor is applied inline via JS.
+ * Size and colour are injected as inline CSS variables from the component.
+ */
+.glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+
+    background: radial-gradient(
+        circle at center,
+        var(--cursor-color, var(--accent-glow)) 0%,
+        transparent 68%
+    );
+
+    /*
+     * will-change: transform tells the GPU to promote this element to its own
+     * compositing layer — ensures transform updates never trigger reflow/repaint.
+     */
+    will-change: transform;
+    pointer-events: none;
+
+    /* Opacity transition only — fade in/out on enter/leave */
+    transition: opacity 0.4s ease;
+}
+
+/* ── Touch / coarse-pointer devices: hide entirely ──── */
+@media (pointer: coarse) {
+    .glow { display: none; }
+}
+
+/* ── Reduced motion: hide entirely ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .glow { display: none; }
+}

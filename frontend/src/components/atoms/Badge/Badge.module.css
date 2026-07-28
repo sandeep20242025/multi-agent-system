@@ -1,0 +1,70 @@
+/* ── Badge — Atom ─────────────────────────────────────── */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+
+    border: 1px solid transparent;
+    backdrop-filter: var(--blur-sm);
+
+    transition: box-shadow var(--transition);
+}
+
+/* ── Variants ─────────────────────────────────────────── */
+.default {
+    background: var(--bg-glass);
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+.primary {
+    background: rgba(0, 229, 255, 0.12);
+    color: var(--accent);
+    border-color: rgba(0, 229, 255, 0.25);
+}
+
+.success {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--success);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+.warning {
+    background: rgba(250, 204, 21, 0.12);
+    color: var(--warning);
+    border-color: rgba(250, 204, 21, 0.25);
+}
+
+.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+/* ── Dot indicator ────────────────────────────────────── */
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+.dot.pulse {
+    animation: pulse-glow 1.5s ease-in-out infinite;
+}

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import ThemeContext from "./ThemeContext";
 
 import storage from "@/lib/storage";
-import THEMES from "@/constants/theme";
+import THEMES from "@/constants/themes";
 
 import {
     DEFAULT_THEME,

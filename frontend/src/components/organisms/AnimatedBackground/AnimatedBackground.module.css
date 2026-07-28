@@ -1,115 +1,296 @@
-.background {
+/* ─────────────────────────────────────────────────────────
+   AnimatedBackground — Organism (CANONICAL)
+   Layered fixed background system.
+   All layers are position: fixed; pointer-events: none.
+   Content slot is position: relative; z-index: 10.
+───────────────────────────────────────────────────────── */
 
+/* ── Local keyframes ──────────────────────────────────── */
+
+/* Blob drift — large slow float */
+@keyframes blobDrift {
+    0%   { transform: translate(0px,   0px)   scale(1);    }
+    33%  { transform: translate(80px, -60px)  scale(1.08); }
+    66%  { transform: translate(-40px, 50px)  scale(0.96); }
+    100% { transform: translate(0px,   0px)   scale(1);    }
+}
+
+/* Gradient slow pan */
+@keyframes gradientPan {
+    0%   { background-position: 0%   50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0%   50%; }
+}
+
+/* Particle drift — float upward & fade */
+@keyframes particleDrift {
+    0%   { opacity: 0;   transform: translateY(0)      scale(0.6); }
+    12%  { opacity: 0.7; }
+    88%  { opacity: 0.4; }
+    100% { opacity: 0;   transform: translateY(-130px) scale(1.3); }
+}
+
+/* Grid glow pulse */
+@keyframes gridPulse {
+    0%, 100% { opacity: 0.28; }
+    50%       { opacity: 0.45; }
+}
+
+/* Scan line sweep */
+@keyframes scanSweep {
+    0%   { top: -1%; }
+    100% { top: 101%; }
+}
+
+/* Spotlight glow breathe */
+@keyframes spotlightBreathe {
+    0%, 100% { opacity: 0.12; }
+    50%       { opacity: 0.18; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   ROOT WRAPPER
+───────────────────────────────────────────────────────── */
+
+.root {
+    position: relative;
+    min-height: 100vh;
+    /* Global opacity override via CSS var injected from component */
+    opacity: var(--bg-opacity, 1);
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 1 — Animated gradient base
+   Fixed, lowest z-index. Slow panning conic / linear gradient.
+───────────────────────────────────────────────────────── */
+
+.gradientLayer {
     position: fixed;
-
     inset: 0;
+    z-index: 0;
+    pointer-events: none;
 
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 40%,  rgba(0, 229, 255, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 70%,  rgba(59, 130, 246, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 50% at 50% 10%,  rgba(124, 58, 237, 0.04) 0%, transparent 60%),
+        var(--bg-main);
+
+    background-size: 200% 200%, 200% 200%, 200% 200%, auto;
+    animation: gradientPan 28s ease infinite;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 2 — Floating glow blobs
+───────────────────────────────────────────────────────── */
+
+.blobLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
     overflow: hidden;
-
-    background: #050816;
-
-    z-index: -1;
-
 }
 
-/* Aurora */
-
-.blob1,
-.blob2,
-.blob3 {
-
+/* Shared blob base */
+.blob {
     position: absolute;
-
-    width: 550px;
-
-    height: 550px;
-
     border-radius: 50%;
-
-    filter: blur(120px);
-
-    opacity: .35;
-
-    animation: float 16s infinite ease-in-out;
-
+    filter: blur(110px);
+    will-change: transform;
 }
 
+/* Blob 1 — accent, top-left */
 .blob1 {
-
-    background: #00E5FF;
-
-    top: -150px;
-
-    left: -120px;
-
+    width: 600px;
+    height: 600px;
+    top: -200px;
+    left: -180px;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.18;
+    animation: blobDrift 22s ease-in-out infinite;
 }
 
+/* Blob 2 — purple, bottom-right */
 .blob2 {
-
-    background: #7C3AED;
-
-    bottom: -180px;
-
-    right: -100px;
-
-    animation-delay: 4s;
-
+    width: 560px;
+    height: 560px;
+    bottom: -200px;
+    right: -160px;
+    background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+    opacity: 0.14;
+    animation: blobDrift 28s ease-in-out infinite reverse;
+    animation-delay: -8s;
 }
 
+/* Blob 3 — secondary blue, centre */
 .blob3 {
-
-    background: #2563EB;
-
-    top: 40%;
-
-    left: 45%;
-
-    animation-delay: 8s;
-
+    width: 480px;
+    height: 480px;
+    top: 25%;
+    left: 35%;
+    background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
+    opacity: 0.12;
+    animation: blobDrift 18s ease-in-out infinite;
+    animation-delay: -13s;
 }
 
-.grid {
+/* Blob 4 — accent, bottom-left — extra depth */
+.blob4 {
+    width: 380px;
+    height: 380px;
+    bottom: 10%;
+    left: 5%;
+    background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity: 0.08;
+    animation: blobDrift 32s ease-in-out infinite reverse;
+    animation-delay: -5s;
+}
 
-    position: absolute;
+/* ─────────────────────────────────────────────────────────
+   LAYER 3 — Floating particles
+───────────────────────────────────────────────────────── */
 
+.particleLayer {
+    position: fixed;
     inset: 0;
-
-    background-image:
-        linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
-
-    background-size: 40px 40px;
-
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
 }
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow);
+    animation: particleDrift linear infinite;
+    will-change: transform, opacity;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 4 — Grid + scan line
+───────────────────────────────────────────────────────── */
+
+.gridLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Grid lines */
+.grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 52px 52px;
+    animation: gridPulse 8s ease-in-out infinite;
+}
+
+/* Travelling scan line */
+.scanLine {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--accent) 30%,
+        var(--accent) 70%,
+        transparent 100%
+    );
+    opacity: 0.07;
+    animation: scanSweep 12s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 5 — Noise overlay (film grain)
+   Inline SVG data-URI — no external asset.
+───────────────────────────────────────────────────────── */
+
+.noiseLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+
+    mix-blend-mode: overlay;
+    opacity: 0.032;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 6 — Cursor spotlight
+   Follows pointer via JS rAF. GPU composited — only
+   transform changes, no layout triggers.
+───────────────────────────────────────────────────────── */
+
+.spotlight {
+    position: fixed;
+    z-index: 5;
+    pointer-events: none;
+    /*
+     * Centre the radial at the pointer tip.
+     * The element is 600×600; translate(-50%,-50%) centres it on the cursor.
+     * translate() is then overridden per-frame by the JS hook.
+     * We use a separate translate for the offset so JS writes a single property.
+     */
+    width: 600px;
+    height: 600px;
+    top: -300px;   /* offset so (0,0) transform = top-left at pointer */
+    left: -300px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 229, 255, 0.1) 0%,
+        rgba(0, 229, 255, 0.04) 35%,
+        transparent 70%
+    );
+    animation: spotlightBreathe 4s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LAYER 7 — Content slot
+───────────────────────────────────────────────────────── */
 
 .content {
-
     position: relative;
-
-    z-index: 2;
-
+    z-index: 10;
     min-height: 100vh;
-
+    pointer-events: auto;
 }
 
-@keyframes float {
+/* ── Optional backdrop blur variants on the content slot ─ */
 
-    0% {
+.blur_sm { backdrop-filter: blur(8px);  -webkit-backdrop-filter: blur(8px);  }
+.blur_md { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.blur_lg { backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); }
 
-        transform: translate(0, 0) scale(1);
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────────── */
 
-    }
+@media (prefers-reduced-motion: reduce) {
+    /* Stop all background animations */
+    .gradientLayer { animation: none; }
 
-    50% {
+    .blob1,
+    .blob2,
+    .blob3,
+    .blob4         { animation: none; }
 
-        transform: translate(80px, -60px) scale(1.2);
+    .particle      { animation: none; opacity: 0; }
 
-    }
+    .grid          { animation: none; opacity: 0.28; }
+    .scanLine      { animation: none; opacity: 0; }
 
-    100% {
-
-        transform: translate(0, 0) scale(1);
-
-    }
-
+    .spotlight     { animation: none; }
 }
