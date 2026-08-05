@@ -1,0 +1,509 @@
+/* ─────────────────────────────────────────────────────────
+   Landing — Page styles
+   Plain CSS (no modules) — consumed via import "./styles.css".
+   Uses only CSS custom property tokens from variables.css.
+   Zero hardcoded colours.
+───────────────────────────────────────────────────────── */
+
+/* ── Local keyframes ──────────────────────────────────── */
+
+@keyframes sectionFadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tlPulse {
+    0%   { left: -10%; opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { left: 110%; opacity: 0; }
+}
+
+@keyframes ctaGlow {
+    0%, 100% { opacity: 0.6; transform: scale(1);   }
+    50%       { opacity: 1;   transform: scale(1.08); }
+}
+
+@keyframes capFadeIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─────────────────────────────────────────────────────────
+   SHARED SECTION SHELL
+───────────────────────────────────────────────────────── */
+
+.landing-section {
+    position: relative;
+    padding: 96px 32px;
+    animation: sectionFadeUp 0.7s ease both;
+}
+
+/* Alternating subtle bg tint */
+.landing-section--alt {
+    background: rgba(0, 229, 255, 0.018);
+}
+
+.section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ── Section header ───────────────────────────────────── */
+
+.section-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 56px;
+}
+
+.section-title {
+    margin: 0;
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    line-height: 1.15;
+}
+
+.section-subtitle {
+    margin: 0;
+    font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+    color: var(--text-secondary);
+    line-height: 1.75;
+    max-width: 560px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   FEATURES SECTION
+───────────────────────────────────────────────────────── */
+
+.feature-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+}
+
+.feature-icon-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.feature-icon {
+    font-size: 28px;
+    color: var(--accent);
+    text-shadow: 0 0 16px var(--accent-glow);
+    line-height: 1;
+}
+
+.feature-title {
+    margin: 0;
+    font-family: "Orbitron", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.feature-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────────────────────
+   HOW IT WORKS — Timeline
+───────────────────────────────────────────────────────── */
+
+.timeline-scroll {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding: 12px 4px 24px;
+    /* Hide scrollbar visually but keep it functional */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar        { height: 4px; }
+.timeline-scroll::-webkit-scrollbar-track  { background: transparent; }
+.timeline-scroll::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 2px; }
+
+.timeline-step {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Connector between steps */
+.timeline-connector {
+    position: relative;
+    width: 48px;
+    height: 2px;
+    background: var(--border);
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+.timeline-line {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+}
+
+/* Travelling pulse dot along connector */
+.timeline-pulse {
+    position: absolute;
+    top: 50%;
+    left: -10%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-50%);
+    box-shadow: 0 0 8px var(--accent-glow);
+    animation: tlPulse 2.2s linear infinite;
+}
+
+.timeline-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    width: 120px;
+    min-height: 120px;
+}
+
+/* Start and end nodes get accent border tint */
+.timeline-card--endpoint {
+    border-color: var(--border-hover) !important;
+}
+
+.timeline-node {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-glass);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.timeline-icon {
+    font-size: 16px;
+    color: var(--accent);
+}
+
+.timeline-label {
+    font-family: "Orbitron", sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.timeline-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────
+   AI AGENTS SECTION
+───────────────────────────────────────────────────────── */
+
+.agent-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.agent-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.agent-icon-wrap {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg-glass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.agent-card:hover .agent-icon-wrap {
+    border-color: var(--border-hover);
+    box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.agent-icon {
+    font-size: 18px;
+    color: var(--accent);
+}
+
+.agent-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.agent-name {
+    font-family: "Orbitron", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.agent-role {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+.agent-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    flex: 1;
+}
+
+/* Capability chip list */
+.agent-caps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.agent-cap {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(0, 229, 255, 0.07);
+    border: 1px solid rgba(0, 229, 255, 0.16);
+    border-radius: var(--radius-full);
+    padding: 3px 10px;
+    animation: capFadeIn 0.3s ease both;
+}
+
+/* ─────────────────────────────────────────────────────────
+   TECHNOLOGY STACK
+───────────────────────────────────────────────────────── */
+
+.stack-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.stack-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+}
+
+.stack-icon-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stack-icon {
+    font-size: 26px;
+    color: var(--accent);
+    text-shadow: 0 0 14px var(--accent-glow);
+    line-height: 1;
+}
+
+.stack-tech {
+    font-family: "Orbitron", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+}
+
+.stack-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────────────────
+   CALL TO ACTION
+───────────────────────────────────────────────────────── */
+
+.landing-cta {
+    padding: 80px 32px 96px;
+}
+
+.cta-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+    overflow: hidden;
+    padding: 64px 40px !important;
+}
+
+/* Ambient glow orbs inside the CTA card */
+.cta-glow {
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: ctaGlow 5s ease-in-out infinite;
+}
+
+.cta-glow--left {
+    top: -120px;
+    left: -120px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+}
+
+.cta-glow--right {
+    bottom: -120px;
+    right: -120px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+    animation-delay: -2.5s;
+}
+
+.cta-title {
+    margin: 0;
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.cta-title-accent {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--accent); /* fallback */
+}
+
+.cta-subtitle {
+    margin: 0;
+    font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+    .landing-section { padding: 72px 24px; }
+    .landing-cta      { padding: 60px 24px 80px; }
+
+    .feature-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .agent-grid   { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .stack-grid   { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .landing-section { padding: 56px 16px; }
+    .section-header  { margin-bottom: 36px; }
+
+    .feature-grid    { grid-template-columns: 1fr; }
+    .agent-grid      { grid-template-columns: 1fr; }
+    .stack-grid      { grid-template-columns: 1fr 1fr; }
+
+    .timeline-card   { width: 100px; min-height: 104px; }
+    .timeline-connector { width: 32px; }
+
+    .cta-card        { padding: 40px 20px !important; }
+    .cta-actions     { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 400px) {
+    .stack-grid { grid-template-columns: 1fr; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-section  { animation: none; opacity: 1; }
+    .timeline-pulse   { animation: none; opacity: 0.5; left: 50%; }
+    .cta-glow         { animation: none; }
+    .agent-cap        { animation: none; opacity: 1; }
+}

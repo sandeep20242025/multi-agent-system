@@ -1,0 +1,934 @@
+/* ─────────────────────────────────────────────────────────
+   Register — Page styles
+   Plain CSS — import "./styles.css".
+   Zero hardcoded colours — CSS custom property tokens only.
+   Shares .remember-* and .recaptcha-* class names with Login
+   (same conventions, same visual language).
+───────────────────────────────────────────────────────── */
+
+/* ── Local keyframes ──────────────────────────────────── */
+
+@keyframes regCardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes regCardOut {
+    from { opacity: 1; transform: translateY(0)     scale(1);    }
+    to   { opacity: 0; transform: translateY(-16px) scale(0.97); }
+}
+
+@keyframes glowDrift {
+    0%, 100% { opacity: 0.5;  transform: scale(1);    }
+    50%       { opacity: 0.85; transform: scale(1.1);  }
+}
+
+@keyframes controlsFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes otpBoxPop {
+    0%   { transform: scale(0.85); opacity: 0; }
+    60%  { transform: scale(1.08);             }
+    100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes timerPulse {
+    0%, 100% { color: var(--warning); }
+    50%       { color: var(--danger);  }
+}
+
+@keyframes rcSpin {
+    from { transform: rotate(0deg);   }
+    to   { transform: rotate(360deg); }
+}
+
+@keyframes rcVerifiedPop {
+    0%   { transform: scale(0.6); opacity: 0; }
+    60%  { transform: scale(1.2);             }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes otpRingPulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+    50%       { box-shadow: 0 0 0 8px transparent;       }
+}
+
+/* ─────────────────────────────────────────────────────────
+   PAGE LAYOUT
+───────────────────────────────────────────────────────── */
+
+.reg-main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* top padding clears the fixed 64px navbar */
+    padding: 88px 20px 48px;
+    gap: 20px;
+}
+
+/* Controls row — ThemeToggle + LanguageSelector */
+.reg-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: controlsFadeIn 0.5s ease 0.1s both;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STEP INDICATOR
+───────────────────────────────────────────────────────── */
+
+.reg-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    animation: controlsFadeIn 0.5s ease 0.18s both;
+}
+
+.reg-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.reg-step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--bg-glass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.reg-step--active .reg-step-circle {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0, 229, 255, 0.08);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.reg-step--done .reg-step-circle {
+    border-color: var(--success);
+    color: var(--success);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.reg-step-label {
+    font-size: 12px;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color var(--transition);
+    white-space: nowrap;
+}
+
+.reg-step--active .reg-step-label { color: var(--accent); }
+.reg-step--done   .reg-step-label { color: var(--success); }
+
+/* Connector line between steps */
+.reg-step-line {
+    width: 48px;
+    height: 2px;
+    background: var(--border);
+    margin: 0 8px;
+    flex-shrink: 0;
+    transition: background var(--transition);
+}
+
+.reg-step-line--done {
+    background: var(--success);
+}
+
+/* ─────────────────────────────────────────────────────────
+   GLASS CARD — Registration + OTP
+───────────────────────────────────────────────────────── */
+
+.reg-card {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    overflow: hidden;
+}
+
+.reg-card--otp {
+    max-width: 460px;
+}
+
+/* Step transition animations */
+.reg-card--in  { animation: regCardIn  0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.reg-card--out { animation: regCardOut 0.28s ease both; }
+
+/* Ambient glow orbs inside the card */
+.card-glow {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+    animation: glowDrift 6s ease-in-out infinite;
+}
+
+.card-glow--tl {
+    top: -90px;
+    left: -90px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+}
+
+.card-glow--br {
+    bottom: -90px;
+    right: -90px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+    animation-delay: -3s;
+}
+
+/* ─────────────────────────────────────────────────────────
+   CARD HEADING
+───────────────────────────────────────────────────────── */
+
+.reg-heading {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.reg-title {
+    margin: 0;
+    font-family: "Orbitron", sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+}
+
+.reg-desc {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    max-width: 380px;
+}
+
+.reg-email-highlight {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────
+   REGISTRATION FORM
+───────────────────────────────────────────────────────── */
+
+.reg-form {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Two-column responsive row */
+.reg-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Generic field wrapper (select, textarea) */
+.reg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Labels matching Input atom */
+.reg-select-label {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+    padding-left: 4px;
+}
+
+.reg-required {
+    color: var(--accent);
+    margin-left: 2px;
+}
+
+/* ── Country select ────────────────────────────────────── */
+
+.reg-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    position: relative;
+}
+
+.reg-select-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.reg-select-wrap--error {
+    border-color: var(--danger);
+}
+
+.reg-select-icon {
+    color: var(--text-muted);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.reg-select {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 8px;
+}
+
+.reg-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.reg-select-chevron {
+    color: var(--text-muted);
+    font-size: 12px;
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+/* ── Textarea (Address) ────────────────────────────────── */
+
+.reg-textarea-wrap {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.reg-textarea-wrap:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.reg-textarea-wrap--error {
+    border-color: var(--danger);
+}
+
+.reg-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.6;
+}
+
+.reg-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* ── Field error message ───────────────────────────────── */
+
+.reg-field-error {
+    margin: 0;
+    font-size: 12px;
+    color: var(--danger);
+    padding-left: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.reg-field-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Password toggle button (inside Input rightIcon) ───── */
+
+.toggle-pass {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1;
+    padding: 0 2px;
+    display: flex;
+    align-items: center;
+    transition: color var(--transition);
+}
+
+.toggle-pass:hover       { color: var(--accent); }
+.toggle-pass:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+/* ── Terms checkbox row ─────────────────────────────────── */
+
+.reg-terms-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Shared .remember-* classes (same as Login) */
+.remember-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    user-select: none;
+    line-height: 1.55;
+}
+
+.remember-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.remember-custom {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-glass);
+    transition: border-color var(--transition), background var(--transition);
+    position: relative;
+}
+
+.remember-checkbox:checked + .remember-custom {
+    border-color: var(--accent);
+    background: rgba(0, 229, 255, 0.15);
+}
+
+.remember-checkbox:checked + .remember-custom::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(45deg);
+}
+
+.remember-label:focus-within .remember-custom {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Inline links in terms text */
+.reg-inline-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity var(--transition);
+}
+
+.reg-inline-link:hover { opacity: 0.75; }
+.reg-inline-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+/* Submit / CTA button */
+.reg-submit-btn {
+    box-shadow: 0 0 24px var(--accent-glow) !important;
+}
+
+/* Footer link text */
+.reg-footer-text {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.login-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity var(--transition);
+}
+
+.login-link:hover { opacity: 0.75; }
+.login-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   reCAPTCHA WIDGET  (same class names as Login/styles.css)
+───────────────────────────────────────────────────────── */
+
+.recaptcha-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.recaptcha-wrap--verified {
+    border-color: rgba(34, 197, 94, 0.35);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.1);
+}
+
+.recaptcha-wrap--error {
+    border-color: rgba(239, 68, 68, 0.45);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+    flex-wrap: wrap;
+}
+
+.recaptcha-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.recaptcha-checkbox {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    border: 2px solid var(--border-hover);
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    padding: 0;
+    outline: none;
+}
+
+.recaptcha-checkbox:hover:not(:disabled) {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.recaptcha-checkbox:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.recaptcha-checkbox:disabled { cursor: default; }
+
+.recaptcha-checkbox--spinning {
+    border-color: var(--accent);
+    border-top-color: transparent;
+    animation: rcSpin 0.75s linear infinite;
+}
+
+.recaptcha-checkbox--done {
+    border-color: var(--success);
+    background: rgba(34, 197, 94, 0.12);
+}
+
+.recaptcha-spinner {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    border-top-color: transparent;
+    animation: rcSpin 0.65s linear infinite;
+}
+
+.recaptcha-tick {
+    display: block;
+    color: var(--success);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    animation: rcVerifiedPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.recaptcha-expired-icon {
+    display: block;
+    color: var(--warning);
+    font-size: 14px;
+    line-height: 1;
+}
+
+.recaptcha-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    user-select: none;
+}
+
+.recaptcha-wrap--verified .recaptcha-text {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.recaptcha-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+}
+
+.recaptcha-logo { opacity: 0.8; }
+
+.recaptcha-brand-name {
+    font-family: "Orbitron", sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.recaptcha-brand-links {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+.recaptcha-error {
+    width: 100%;
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.recaptcha-error::before {
+    content: "!";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────
+   OTP STEP COMPONENTS
+───────────────────────────────────────────────────────── */
+
+/* ── OTP icon ring ────────────────────────────────────── */
+
+.otp-icon-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.otp-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: rgba(0, 229, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px var(--accent-glow);
+    animation: otpRingPulse 2.4s ease-in-out infinite;
+}
+
+.otp-ring-symbol {
+    font-family: "Orbitron", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+/* ── Six-digit OTP input grid ─────────────────────────── */
+
+.otp-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.otp-group--error .otp-box {
+    border-color: var(--danger);
+}
+
+.otp-box {
+    width: 48px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg-glass);
+    backdrop-filter: var(--blur-sm);
+    -webkit-backdrop-filter: var(--blur-sm);
+
+    font-family: "Orbitron", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+    caret-color: var(--accent);
+    animation: otpBoxPop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.otp-box:nth-child(1) { animation-delay: 0.00s; }
+.otp-box:nth-child(2) { animation-delay: 0.04s; }
+.otp-box:nth-child(3) { animation-delay: 0.08s; }
+.otp-box:nth-child(4) { animation-delay: 0.12s; }
+.otp-box:nth-child(5) { animation-delay: 0.16s; }
+.otp-box:nth-child(6) { animation-delay: 0.20s; }
+
+.otp-box:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.otp-box--filled {
+    border-color: var(--accent);
+    background: rgba(0, 229, 255, 0.06);
+}
+
+.otp-box:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* OTP inline error */
+.otp-error {
+    text-align: center;
+    justify-content: center;
+}
+
+/* ── Countdown timer ──────────────────────────────────── */
+
+.otp-timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.otp-timer-label {
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+
+.otp-timer-value {
+    font-family: "Orbitron", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    /* Turn red in the last 30 seconds — CSS only */
+    transition: color 0.5s ease;
+}
+
+.otp-timer-expired {
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    animation: timerPulse 1.4s ease-in-out infinite;
+}
+
+/* ── Resend row ───────────────────────────────────────── */
+
+.otp-resend-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.otp-resend-label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.otp-resend-btn {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: opacity var(--transition);
+    letter-spacing: 0.02em;
+}
+
+.otp-resend-btn:hover:not(:disabled)  { opacity: 0.75; }
+.otp-resend-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+}
+
+/* Disabled while countdown is running */
+.otp-resend-btn--disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.otp-resend-count {
+    font-size: 10px;
+    font-family: "Orbitron", sans-serif;
+    color: var(--text-muted);
+    background: var(--bg-glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 1px 6px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .reg-main      { padding: 80px 12px 40px; }
+
+    .reg-card      { max-width: 100%; }
+
+    .reg-row-2     { grid-template-columns: 1fr; }
+
+    /* Step indicator: hide labels on small screens */
+    .reg-step-label  { display: none; }
+    .reg-step-line   { width: 28px; }
+
+    .otp-box         { width: 40px; height: 50px; font-size: 18px; }
+    .otp-group       { gap: 7px; }
+}
+
+@media (max-width: 380px) {
+    .otp-box   { width: 36px; height: 46px; font-size: 16px; }
+    .otp-group { gap: 5px; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .reg-card,
+    .reg-controls       { animation: none; opacity: 1; }
+
+    .card-glow          { animation: none; }
+    .otp-ring           { animation: none; }
+    .otp-box            { animation: none; opacity: 1; }
+    .otp-timer-expired  { animation: none; }
+
+    .recaptcha-checkbox--spinning { animation: none; }
+    .recaptcha-spinner            { animation: none; }
+    .recaptcha-tick               { animation: none; opacity: 1; }
+
+    .toggle-pass,
+    .login-link,
+    .reg-inline-link,
+    .remember-custom,
+    .recaptcha-wrap,
+    .recaptcha-checkbox,
+    .otp-resend-btn     { transition: none; }
+}

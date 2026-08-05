@@ -1,0 +1,701 @@
+/* ─────────────────────────────────────────────────────────
+   Dashboard — CSS Module
+   Design: clean, minimal — similar to Linear / Notion.
+   Stats as simple rows. Tables are borderless.
+   Glassmorphism reduced to single subtle border only.
+   Zero hardcoded colours.
+───────────────────────────────────────────────────────── */
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progGrow {
+    from { width: 0 !important; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   PAGE WRAPPER
+───────────────────────────────────────────────────────── */
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    max-width: 1080px;
+    margin: 0 auto;
+    animation: fadeUp 0.3s ease both;
+}
+
+/* ─────────────────────────────────────────────────────────
+   SECTION
+───────────────────────────────────────────────────────── */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ─────────────────────────────────────────────────────────
+   WELCOME
+───────────────────────────────────────────────────────── */
+.welcome {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.welcomeText { display: flex; flex-direction: column; gap: 4px; }
+
+.welcomeSub {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+}
+
+.welcomeTitle {
+    margin: 0;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 650;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+}
+
+.welcomeAccent {
+    color: var(--accent);
+}
+
+.welcomeDesc {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+.welcomeMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.welcomeDate {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────────────────
+   STATS — flat row of 6 numbers, no cards
+───────────────────────────────────────────────────────── */
+.statsGrid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.statItem {
+    padding: 16px 18px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: var(--bg-secondary);
+    transition: background 150ms;
+}
+
+.statItem:last-child { border-right: none; }
+.statItem:hover { background: var(--bg-card); }
+
+/* The GlassCard inside — completely overridden to be invisible */
+.statCard {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
+
+.statCard::before { display: none !important; }
+
+.statTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.statIcon {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.statTrend { font-size: 10px !important; }
+
+.statValue {
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    font-weight: 650;
+    color: var(--text-primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.statLabel {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────
+   QUICK ACTIONS — icon buttons, no cards
+───────────────────────────────────────────────────────── */
+.actionsGrid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.actionItem { display: contents; }
+
+/* The GlassCard inside becomes a flat chip */
+.actionCard {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    cursor: pointer;
+    transition: background 150ms, border-color 150ms !important;
+    transform: none !important;
+}
+
+.actionCard::before { display: none !important; }
+
+.actionCard:hover {
+    background: var(--bg-card) !important;
+    border-color: var(--border-hover) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.actionIcon {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.actionBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.actionTitle {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.actionDesc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* Button inside action card — hidden, card handles click */
+.actionBtn { display: none !important; }
+
+/* ─────────────────────────────────────────────────────────
+   ROW 2 — PROJECTS + AGENTS
+───────────────────────────────────────────────────────── */
+.row2 {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Projects table ────────────────────────────────────── */
+.tableCard {
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.tableCard::before { display: none !important; }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 10px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.tr { transition: background 120ms; }
+.tr:hover { background: var(--bg-glass); }
+
+.td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.tr:last-child .td { border-bottom: none; }
+
+.projectName {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.progOuter {
+    width: 72px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.progFill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: progGrow 0.6s ease both;
+}
+
+.progLabel {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.dateText {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ── Running agents — list rows, no cards ──────────────── */
+.liveBadge { font-size: 9px !important; margin-left: auto; }
+
+.agentCards { display: flex; flex-direction: column; gap: 0; }
+
+/* Override GlassCard to a plain divider row */
+.agentCard {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 0 !important;
+    padding: 10px 4px !important;
+    transform: none !important;
+}
+
+.agentCard::before { display: none !important; }
+.agentCard:hover { background: var(--bg-glass) !important; }
+.agentCard:last-child { border-bottom: none !important; }
+
+.agentTop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.agentInfo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.agentName {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.agentRole { font-size: 11.5px; color: var(--text-muted); }
+
+.agentRight {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.agentTask {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.agentProgTrack {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.agentProgFill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: progGrow 0.6s ease both;
+}
+
+/* ─────────────────────────────────────────────────────────
+   ROW 3 — CONVERSATIONS + FILES
+───────────────────────────────────────────────────────── */
+.row3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Conversations ─────────────────────────────────────── */
+.convList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.convItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 120ms;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.convItem:last-child { border-bottom: none; }
+.convItem:hover { background: var(--bg-glass); padding-left: 6px; padding-right: 6px; }
+
+.convIcon { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+
+.convBody {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.convTitle {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.convAgent { font-size: 11.5px; color: var(--text-muted); }
+.convTime  { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+/* ── Files ──────────────────────────────────────────────── */
+.fileList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.fileItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    transition: background 120ms;
+    border-radius: 6px;
+}
+
+.fileItem:last-child { border-bottom: none; }
+.fileItem:hover { background: var(--bg-glass); padding-left: 6px; padding-right: 6px; }
+
+.fileIcon { font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+
+.fileBody {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fileName {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fileMeta { display: flex; align-items: center; gap: 6px; }
+
+.fileTypeBadge { font-size: 9px !important; }
+
+.fileSize  { font-size: 11.5px; color: var(--text-muted); }
+.fileDate  { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+/* ─────────────────────────────────────────────────────────
+   ROW 4 — TIMELINE + SYSTEM STATUS
+───────────────────────────────────────────────────────── */
+.row4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Timeline — minimal vertical list ─────────────────── */
+.timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.timelineItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    padding: 0 0 16px;
+}
+
+.timelineItem:last-child { padding-bottom: 0; }
+
+.timelineLine {
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    width: 1px;
+    bottom: 0;
+    background: var(--border);
+}
+
+.timelineDot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    color: var(--text-muted);
+}
+
+.timelineBody {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-top: 1px;
+}
+
+.timelineLabel { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.timelineDesc  { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+.timelineTime {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+/* ── System Status ─────────────────────────────────────── */
+.statusCard {
+    background: transparent !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.statusCard::before { display: none !important; }
+
+.statusHealth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.statusHealthDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    flex-shrink: 0;
+}
+
+.statusHealthLabel {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.statusList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.statusItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.statusItemLabel {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    width: 106px;
+    flex-shrink: 0;
+}
+
+.statusBarOuter {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.statusBarFill {
+    height: 100%;
+    border-radius: 2px;
+    animation: progGrow 0.6s ease both;
+}
+
+.statusBar_success { background: var(--success); }
+.statusBar_warning { background: var(--warning); }
+.statusBar_danger  { background: var(--danger);  }
+.statusBar_default { background: var(--accent);  }
+
+.statusValue {
+    font-size: 10px !important;
+    width: 68px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .statsGrid   { grid-template-columns: repeat(3, 1fr); }
+    .actionsGrid { flex-wrap: wrap; }
+}
+
+@media (max-width: 900px) {
+    .row2, .row3, .row4 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+    .statsGrid { grid-template-columns: repeat(2, 1fr); }
+    .welcome   { flex-direction: column; gap: 12px; }
+    .welcomeMeta { align-items: flex-start; }
+}
+
+@media (max-width: 460px) {
+    .statsGrid { grid-template-columns: 1fr 1fr; }
+    .page      { gap: 24px; }
+}
+
+/* ─────────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .page      { animation: none; }
+    .progFill,
+    .agentProgFill,
+    .statusBarFill { animation: none; }
+    .statItem,
+    .convItem,
+    .fileItem,
+    .agentCard,
+    .tr        { transition: none; }
+}

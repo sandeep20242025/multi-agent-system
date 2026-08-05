@@ -1,10 +1,15 @@
 const ROUTES = {
-    HOME: "/",
-    LOGIN: "/login",
-    REGISTER: "/register",
-    WORKSPACE: "/workspace",
-    SETTINGS: "/settings",
-    PROFILE: "/profile",
+    HOME:          "/",
+    LOGIN:         "/login",
+    REGISTER:      "/register",
+    WORKSPACE:     "/workspace",
+    CHAT:          "/chat",
+    AGENTS:        "/agents",
+    FILES:         "/files",
+    PROJECTS:      "/projects",
+    SETTINGS:      "/settings",
+    NOTIFICATIONS: "/notifications",
+    PROFILE:       "/profile",
 };
 
 export default ROUTES;
